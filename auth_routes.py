@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from models import Usuarios
 from dependencias import pegar_sessao
 from main import bcrypt_context
+from schemas import UsuarioSchema
+from sqlalchemy.orm import Session
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -11,15 +13,15 @@ async def home():
 
 
 @auth_router.post("/criar_conta")
-async def criar_conta(email : str , senha : str, nome : str, session = Depends(pegar_sessao)):
+async def criar_conta(usuario_schema: UsuarioSchema, session: Session = Depends(pegar_sessao)):
 
-    usuario = session.query(Usuarios).filter(Usuarios.email==email).first()
+    usuario = session.query(Usuarios).filter(Usuarios.email==usuario_schema.email).first()
     if usuario:
         #ja existe esse usuario
-        return HTTPException(status_code=400, datail="email de usuario ja cadastrado")
+        return HTTPException(status_code=400, detail="email de usuario ja cadastrado")
     else:
-        senha_criptografada = bcrypt_context.hash(senha)
-        novo_usuario = Usuarios(nome, email, senha_criptografada)
+        senha_criptografada = bcrypt_context.hash(usuario_schema.senha)
+        novo_usuario = Usuarios(usuario_schema.nome, usuario_schema.email, senha_criptografada, usuario_schema.ativo, usuario_schema.admin)
         session.add(novo_usuario)
         session.commit()
-        return {"messagem": "usuario cadastrado com sucesso"}
+        return {"message": "usuario cadastrado com sucesso"}
