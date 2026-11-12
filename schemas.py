@@ -2,11 +2,24 @@ from pydantic import BaseModel, Field
 from typing import Optional
 
 class UsuarioSchema(BaseModel):
-    nome: str = Field(..., example="johndoe")
-    email: str = Field(..., example="")
-    senha: str = Field(..., example="123456")
-    ativo: Optional[bool] = Field(default=True, example=True)
-    admin: Optional[bool] = Field(default=False, example=False)
+    nome: str
+    email: str
+    senha: str
+    ativo: Optional[bool]
+    admin: Optional[bool]
+
+    class Config:
+        from_atributes = True
+
+class PedidoSchema(BaseModel):
+    usuario: int
+
+    class Config:
+        from_atributes = True
+
+class LoginSchema(BaseModel):
+    email: str
+    senha: str
 
     class Config:
         from_atributes = True

@@ -67,3 +67,5 @@ class ItensPedido(Base):
         self.tamanho = tamanho
         self.preco_unitario = preco_unitario
         self.pedido = pedido
+
+Base.metadata.create_all(bind=db)
